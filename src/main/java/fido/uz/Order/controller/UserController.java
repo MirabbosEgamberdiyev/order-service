@@ -1,4 +1,4 @@
-package fido.uz.Order.authController;
+package fido.uz.Order.controller;
 import fido.uz.Order.authService.UserService;
 import fido.uz.Order.entity.User;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +33,10 @@ public class UserController {
         List <User> users = userService.allUsers();
 
         return ResponseEntity.ok(users);
+    }
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+
+        return ResponseEntity.ok("Test mofaqiyatli o'tdi ");
     }
 }
