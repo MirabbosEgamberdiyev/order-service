@@ -35,7 +35,9 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())  // Disable CSRF for stateless REST APIs
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Enable CORS with the configured CorsConfigurationSource
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()  // Allow all requests to /auth/**
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/api/teachers/get-all").hasRole("ADMIN")
                         .anyRequest().authenticated()  // Require authentication for all other requests
                 )
                 .sessionManagement(session -> session

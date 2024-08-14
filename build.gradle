@@ -31,6 +31,11 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation 'org.postgresql:postgresql:42.6.0'
 	implementation 'org.springframework.boot:spring-boot-starter-security:2.7.0'  // or another version
+	// OpenAPI and Swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+	implementation 'io.swagger:swagger-annotations:1.5.0'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
