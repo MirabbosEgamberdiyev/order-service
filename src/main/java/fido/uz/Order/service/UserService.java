@@ -1,11 +1,10 @@
-package fido.uz.Order.authService;
+package fido.uz.Order.service;
 
 
 import fido.uz.Order.entity.User;
 import fido.uz.Order.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service

@@ -1,5 +1,5 @@
 package fido.uz.Order.controller;
-import fido.uz.Order.authService.UserService;
+import fido.uz.Order.service.UserService;
 import fido.uz.Order.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

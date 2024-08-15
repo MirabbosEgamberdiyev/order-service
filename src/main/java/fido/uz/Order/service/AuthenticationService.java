@@ -1,4 +1,4 @@
-package fido.uz.Order.authService;
+package fido.uz.Order.service;
 
 
 import fido.uz.Order.dto.ChangePasswordDto;
@@ -74,8 +74,8 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public void deleteUser(Integer id) {
-        userRepository.deleteById(id);
+    public void deleteUser(String email) {
+        userRepository.deleteByEmail(email);
     }
 
     @Transactional
