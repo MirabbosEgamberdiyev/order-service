@@ -25,7 +25,6 @@ public class Bot {
     private String botToken;
 
     @NotBlank
-    @Column(nullable = false)
     private Long userId;
 
 }
