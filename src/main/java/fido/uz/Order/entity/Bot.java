@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "bots")
 @Entity
 public class Bot {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -24,7 +23,7 @@ public class Bot {
     @Column(nullable = false)
     private String botToken;
 
-    @NotBlank
+    @Column(nullable = false)
     private Long userId;
 
 }

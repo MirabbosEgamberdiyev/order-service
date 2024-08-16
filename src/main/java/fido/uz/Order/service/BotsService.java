@@ -23,7 +23,6 @@ public class BotsService {
         this.botRepository = botRepository;
         this.userRepository = userRepository;
     }
-
     // Create a new bot
     public ResponseBot createBot(BotDto botDto) {
         // Check if a bot with the same token already exists
