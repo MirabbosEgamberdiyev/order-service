@@ -10,11 +10,14 @@ import fido.uz.Order.repository.BotsRepository;
 import fido.uz.Order.repository.CategoriesRepository;
 import fido.uz.Order.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,19 +69,39 @@ public class CategoriesService {
 
 
     public CategoryResponseDto getCategoryById(Long categoryId) {
-        Category category = categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new EntityNotFoundException("Category with ID " + categoryId + " not found"));
-
-        return convertToDto(category);
+        Optional<Category> category = categoriesRepository.findById(categoryId);
+        CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+        categoryResponseDto.setId(category.get().getId());
+        categoryResponseDto.setName(category.get().getName());
+        categoryResponseDto.setBotToken(category.get().getBotToken());
+        Hibernate.initialize(category.get().getProducts()); // Initialize products
+        categoryResponseDto.setProductNames(category.get().getProducts().stream().map(Product::getName).collect(Collectors.toList()));
+        categoryResponseDto.setUserId(fetchUserById(category.get().getUserId()).getId());
+        return categoryResponseDto;
     }
+
 
     public List<CategoryResponseDto> getAllCategories() {
         List<Category> categories = categoriesRepository.findAll();
-        return categories.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
+        List<CategoryResponseDto> categoryResponseDtos = new ArrayList<>();
 
+        for (Category category : categories) {
+            // Initialize the products collection
+            Hibernate.initialize(category.getProducts());
+
+            // Convert to DTO
+            CategoryResponseDto categoryResponseDto = new CategoryResponseDto();
+            categoryResponseDto.setId(category.getId());
+            categoryResponseDto.setName(category.getName());
+            categoryResponseDto.setBotToken(category.getBotToken());
+            categoryResponseDto.setProductNames(category.getProducts().stream().map(Product::getName).collect(Collectors.toList()));
+            categoryResponseDto.setUserId(fetchUserById(category.getUserId()).getId());
+
+            categoryResponseDtos.add(categoryResponseDto);
+        }
+
+        return categoryResponseDtos;
+    }
     private CategoryResponseDto convertToDto(Category category) {
         CategoryResponseDto categoryDto = new CategoryResponseDto();
         categoryDto.setId(category.getId());
