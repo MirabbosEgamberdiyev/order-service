@@ -1,8 +1,6 @@
-package fido.uz.Order.entity;
+package fido.uz.Order.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -14,20 +12,15 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "category")
-@Entity
-public class Category {
+public class CategoryResponseDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
     private Long id;
 
     @NotBlank
     @Size(max = 100)
     @Column(nullable = false)
     private String name;
-
+    
     @NotBlank
     @Size(max = 100)
     @Column(nullable = false)
@@ -36,8 +29,6 @@ public class Category {
     @Column(nullable = false)
     private Long userId;
 
+    private List<String> productNames;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Product> products;
 }

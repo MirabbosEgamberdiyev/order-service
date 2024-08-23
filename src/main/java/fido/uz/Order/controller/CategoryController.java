@@ -1,14 +1,15 @@
 package fido.uz.Order.controller;
 
 import fido.uz.Order.dto.CategoryDto;
+import fido.uz.Order.dto.CategoryResponseDto;
 import fido.uz.Order.entity.Category;
-import fido.uz.Order.entity.ResponseCategory;
 import fido.uz.Order.service.CategoriesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/create")
-    public ResponseEntity<?> createCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
         try {
             Category category = categoriesService.createCategory(categoryDto);
             return new ResponseEntity<>(category, HttpStatus.CREATED);
@@ -60,7 +61,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         try {
-            Category category = categoriesService.getCategoryById(id);
+            CategoryResponseDto category = categoriesService.getCategoryById(id);
             return new ResponseEntity<>(category, HttpStatus.OK);
         } catch (IllegalArgumentException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -74,11 +75,13 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Category.class)))
     })
+    // Get All Categories
     @GetMapping("/all")
-    public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = categoriesService.getAllCategories();
-        return new ResponseEntity<>(categories, HttpStatus.OK);
+    public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {
+        List<CategoryResponseDto> categories = categoriesService.getAllCategories();
+        return ResponseEntity.ok(categories);
     }
+
 
     // UPDATE
     @Operation(summary = "Update an existing category")
@@ -92,7 +95,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<?> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDto categoryDto) {
         try {
             Category updatedCategory = categoriesService.updateCategory(id, categoryDto);
             return new ResponseEntity<>(updatedCategory, HttpStatus.OK);

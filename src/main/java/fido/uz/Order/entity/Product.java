@@ -1,22 +1,21 @@
 package fido.uz.Order.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "category")
+@Table(name = "products")
 @Entity
-public class Category {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -28,16 +27,26 @@ public class Category {
     @Column(nullable = false)
     private String name;
 
+    @Size(max = 255)
+    private String description;
+
+    @NotNull
+    @Column(nullable = false)
+    private BigDecimal price;
+
+    private String imageUrl;
+
+    // Many Products belong to one Category
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @NotBlank
     @Size(max = 100)
     @Column(nullable = false)
     private String botToken;
 
+    @NotNull
     @Column(nullable = false)
     private Long userId;
-
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Product> products;
 }
