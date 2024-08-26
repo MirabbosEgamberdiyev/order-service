@@ -1,6 +1,7 @@
 package fido.uz.Order.service;
 
 import fido.uz.Order.dto.ProductDto;
+import fido.uz.Order.dto.ProductResponseDto;
 import fido.uz.Order.entity.Bot;
 import fido.uz.Order.entity.Category;
 import fido.uz.Order.entity.Product;
@@ -10,10 +11,12 @@ import fido.uz.Order.repository.CategoriesRepository;
 import fido.uz.Order.repository.ProductsRepository;
 import fido.uz.Order.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -60,16 +63,38 @@ public class ProductService {
         return productsRepository.save(product);
     }
 
-    // Get Product by ID
-    public Product getProductById(Long id) {
-        return productsRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+    @Transactional
+    public ProductResponseDto getProductById(Long id) {
+        Product product = productsRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id " + id));
+        return convertToDto(product);
     }
 
-    // Get All Products
-    public List<Product> getAllProducts() {
-        return productsRepository.findAll();
+
+    @Transactional()
+    public List<ProductResponseDto> getAllProducts() {
+        List<Product> products = productsRepository.findAll();
+        return products.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
+
+    private ProductResponseDto convertToDto(Product product) {
+        ProductResponseDto dto = new ProductResponseDto();
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
+        dto.setImageUrl(product.getImageUrl());
+        dto.setBotToken(product.getBotToken());
+        dto.setUserId(product.getUserId());
+
+        // Fetch category name to avoid lazy initialization issues
+        dto.setCategoryName(product.getCategory() != null ? product.getCategory().getName() : "No category");
+
+        return dto;
+    }
+
+
 
     // Update
     public Product updateProduct(Long id, ProductDto productDto) {

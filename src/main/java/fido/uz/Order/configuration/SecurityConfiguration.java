@@ -59,7 +59,16 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll() // Allow all requests without authentication
+//                        .anyRequest().permitAll() // Allow all requests without authentication
+                                .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/users/me").hasAnyRole("USER", "ADMIN", "SUPER_ADMIN")
+                                .requestMatchers("/users/test").hasAnyRole("ADMIN")
+                                .requestMatchers("/users/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/super-admin/**").hasRole("SUPER_ADMIN")
+                                .anyRequest().authenticated()
+
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

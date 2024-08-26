@@ -1,6 +1,6 @@
-package fido.uz.Order.entity;
+package fido.uz.Order.dto;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,14 +13,8 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "products")
-@Entity
-public class Product {
+public class ProductResponseDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
-    private Long id;
 
     @NotBlank
     @Size(max = 100)
@@ -36,9 +30,7 @@ public class Product {
 
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    private String categoryName;
 
     @NotBlank
     @Size(max = 100)
