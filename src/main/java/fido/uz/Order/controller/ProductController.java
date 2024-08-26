@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class ProductController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> createProduct(@RequestBody ProductDto productDto) {
         try {
             Product product = productService.createProduct(productDto);
@@ -58,6 +60,7 @@ public class ProductController {
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
         try {
             ProductResponseDto product = productService.getProductById(id);
@@ -75,6 +78,7 @@ public class ProductController {
                             schema = @Schema(implementation = Product.class)))
     })
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
         List<ProductResponseDto> products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
@@ -92,6 +96,7 @@ public class ProductController {
                     content = @Content(mediaType = "application/json"))
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
         try {
             Product updatedProduct = productService.updateProduct(id, productDto);
@@ -111,6 +116,7 @@ public class ProductController {
                     content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         try {
             productService.deleteProduct(id);

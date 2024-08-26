@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryDto categoryDto) {
         try {
             Category category = categoriesService.createCategory(categoryDto);
@@ -59,6 +61,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> getCategoryById(@PathVariable Long id) {
         try {
             CategoryResponseDto category = categoriesService.getCategoryById(id);
@@ -78,6 +81,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {
         try {
             List<CategoryResponseDto> categories = categoriesService.getAllCategories();
@@ -103,6 +107,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDto categoryDto) {
         try {
             Category updatedCategory = categoriesService.updateCategory(id, categoryDto);
@@ -122,6 +127,7 @@ public class CategoryController {
                     content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
         try {
             categoriesService.deleteCategory(id);
