@@ -22,7 +22,7 @@ public class DataLoader {
                 superAdmin.setFullName("Super Admin");
                 superAdmin.setEmail("superadmin@example.com");
                 superAdmin.setPassword(passwordEncoder.encode("superadmin123")); // Default password
-                superAdmin.setRoles(List.of(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.USER));
+                superAdmin.setRoles(List.of(UserRole.ROLE_SUPER_ADMIN, UserRole.ROLE_ADMIN, UserRole.ROLE_USER));
                 userRepository.save(superAdmin);
             }
 
@@ -32,7 +32,7 @@ public class DataLoader {
                 admin.setFullName("Admin User");
                 admin.setEmail("admin@example.com");
                 admin.setPassword(passwordEncoder.encode("admin123")); // Default password
-                admin.setRoles(List.of(UserRole.ADMIN, UserRole.USER));
+                admin.setRoles(List.of(UserRole.ROLE_ADMIN, UserRole.ROLE_USER));
                 userRepository.save(admin);
             }
 
@@ -42,7 +42,7 @@ public class DataLoader {
                 user.setFullName("Regular User");
                 user.setEmail("user@example.com");
                 user.setPassword(passwordEncoder.encode("user123")); // Default password
-                user.setRoles(List.of(UserRole.USER));
+                user.setRoles(List.of(UserRole.ROLE_USER));
                 userRepository.save(user);
             }
         };

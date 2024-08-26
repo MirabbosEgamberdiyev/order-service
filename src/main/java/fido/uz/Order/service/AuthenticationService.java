@@ -39,7 +39,7 @@ public class AuthenticationService {
         user.setFullName(input.getFullName());
         user.setEmail(input.getEmail());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
-        user.setRoles(List.of(UserRole.USER));
+        user.setRoles(List.of(UserRole.ROLE_USER));
         return userRepository.save(user);
     }
 
@@ -48,7 +48,7 @@ public class AuthenticationService {
         user.setFullName(input.getFullName());
         user.setEmail(input.getEmail());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
-        user.setRoles(List.of(UserRole.ADMIN, UserRole.USER));
+        user.setRoles(List.of(UserRole.ROLE_ADMIN, UserRole.ROLE_USER));
         return userRepository.save(user);
     }
     public User signUpSuperAdmin(RegisterUserDto input) {
@@ -56,7 +56,7 @@ public class AuthenticationService {
         user.setFullName(input.getFullName());
         user.setEmail(input.getEmail());
         user.setPassword(passwordEncoder.encode(input.getPassword()));
-        user.setRoles(List.of(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER));
+        user.setRoles(List.of(UserRole.ROLE_ADMIN, UserRole.ROLE_SUPER_ADMIN, UserRole.ROLE_USER));
 
         return userRepository.save(user);
     }

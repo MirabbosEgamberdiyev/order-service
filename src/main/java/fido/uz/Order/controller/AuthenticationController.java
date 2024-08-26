@@ -1,6 +1,5 @@
 package fido.uz.Order.controller;
 
-import fido.uz.Order.service.AuthenticationService;
 import fido.uz.Order.dto.ChangePasswordDto;
 import fido.uz.Order.dto.LoginUserDto;
 import fido.uz.Order.dto.RegisterUserDto;
@@ -8,18 +7,21 @@ import fido.uz.Order.dto.ResetPasswordDto;
 import fido.uz.Order.entity.User;
 import fido.uz.Order.jwt.JwtService;
 import fido.uz.Order.response.LoginResponse;
+import fido.uz.Order.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/auth")
 @RestController
+@RequestMapping("/auth")
 public class AuthenticationController {
 
     private final JwtService jwtService;
@@ -39,6 +41,7 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup-user")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<User> registerUser(@RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signUpUser(registerUserDto);
         return ResponseEntity.ok(registeredUser);
@@ -53,6 +56,7 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup-admin")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<User> registerAdmin(@RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signUpAdmin(registerUserDto);
         return ResponseEntity.ok(registeredUser);
@@ -67,6 +71,7 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup-super-admin")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<User> registerSuperAdmin(@RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signUpSuperAdmin(registerUserDto);
         return ResponseEntity.ok(registeredUser);
@@ -82,10 +87,15 @@ public class AuthenticationController {
     })
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
-        User authenticatedUser = authenticationService.authenticate(loginUserDto);
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
-        return ResponseEntity.ok(loginResponse);
+        try {
+            User authenticatedUser = authenticationService.authenticate(loginUserDto);
+            String jwtToken = jwtService.generateToken(authenticatedUser);
+            LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+            return ResponseEntity.ok(loginResponse);
+        } catch (Exception e) {
+            // Log exception and return unauthorized status
+            return ResponseEntity.status(401).body(null);
+        }
     }
 
     @Operation(summary = "Logout the current user")
@@ -97,8 +107,13 @@ public class AuthenticationController {
     })
     @PostMapping("/logout")
     public ResponseEntity<String> logout() {
-        SecurityContextHolder.clearContext();
-        return ResponseEntity.ok("Logged out successfully");
+        try {
+            SecurityContextHolder.clearContext();
+            return ResponseEntity.ok("Logged out successfully");
+        } catch (Exception e) {
+            // Log exception and return internal server error status
+            return ResponseEntity.status(500).body("Logout failed");
+        }
     }
 
     @Operation(summary = "Delete the current user's account")
@@ -109,16 +124,22 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/delete-account")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteAccount() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = userDetails.getUsername();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = ((UserDetails) authentication.getPrincipal()).getUsername();
 
-        User user = authenticationService.getUserByEmail(email);
-        if (user == null) {
-            return ResponseEntity.badRequest().body("User not found");
+            User user = authenticationService.getUserByEmail(email);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("User not found");
+            }
+            authenticationService.deleteUser(email);
+            return ResponseEntity.ok("Account deleted successfully");
+        } catch (Exception e) {
+            // Log exception and return bad request status
+            return ResponseEntity.badRequest().body("Failed to delete account");
         }
-        authenticationService.deleteUser(email);
-        return ResponseEntity.ok("Account deleted successfully");
     }
 
     @Operation(summary = "Change the current user's password")
@@ -129,14 +150,20 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/change-password")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = userDetails.getUsername();
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = ((UserDetails) authentication.getPrincipal()).getUsername();
 
-        changePasswordDto.setEmail(email);
-        authenticationService.changePassword(changePasswordDto);
+            changePasswordDto.setEmail(email);
+            authenticationService.changePassword(changePasswordDto);
 
-        return ResponseEntity.ok("Password changed successfully");
+            return ResponseEntity.ok("Password changed successfully");
+        } catch (Exception e) {
+            // Log exception and return bad request status
+            return ResponseEntity.badRequest().body("Failed to change password");
+        }
     }
 
     @Operation(summary = "Reset a user's password (Admin only)")
@@ -147,8 +174,14 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/reset-password")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
-        authenticationService.resetPassword(resetPasswordDto);
-        return ResponseEntity.ok("Password reset successfully");
+        try {
+            authenticationService.resetPassword(resetPasswordDto);
+            return ResponseEntity.ok("Password reset successfully");
+        } catch (Exception e) {
+            // Log exception and return bad request status
+            return ResponseEntity.badRequest().body("Failed to reset password");
+        }
     }
 }

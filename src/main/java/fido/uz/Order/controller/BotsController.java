@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/bots")
@@ -34,6 +35,7 @@ public class BotsController {
                             schema = @Schema(implementation = ResponseBot.class)))
     })
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<ResponseBot> createBot(@RequestBody BotDto botDto) {
         ResponseBot botResponse = botService.createBot(botDto);
         if (botResponse.getText().contains("already exists")) {
@@ -52,6 +54,7 @@ public class BotsController {
                             schema = @Schema(implementation = ResponseBot.class)))
     })
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<ResponseBot> getAll(@RequestParam Long userId) {
         ResponseBot results = botService.getAll(userId);
         if (results.getText().contains("No bots found")) {
@@ -70,6 +73,7 @@ public class BotsController {
                             schema = @Schema(implementation = ResponseBot.class)))
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<ResponseBot> getBotById(@PathVariable Long id) {
         ResponseBot botResponse = botService.getBotById(id);
         if (botResponse.getText().contains("Bot not found")) {
@@ -88,6 +92,7 @@ public class BotsController {
                             schema = @Schema(implementation = ResponseBot.class)))
     })
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<ResponseBot> updateBot(@PathVariable Long id, @RequestBody BotDto botDto) {
         ResponseBot botResponse = botService.updateBot(id, botDto);
         if (botResponse.getText().contains("Bot not found")) {
@@ -106,6 +111,7 @@ public class BotsController {
                             schema = @Schema(implementation = ResponseBot.class)))
     })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<ResponseBot> deleteBot(@PathVariable Long id) {
         ResponseBot botResponse = botService.deleteBot(id);
         if (botResponse.getText().contains("Bot not found")) {
