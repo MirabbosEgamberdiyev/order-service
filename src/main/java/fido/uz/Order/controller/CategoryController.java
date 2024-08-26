@@ -68,18 +68,26 @@ public class CategoryController {
         }
     }
 
-    // READ - Get All Categories
+    // READ - Get all Categories
     @Operation(summary = "Get all categories")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Categories retrieved",
+            @ApiResponse(responseCode = "200", description = "Categories found",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = Category.class)))
+                            schema = @Schema(implementation = CategoryResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "No categories found",
+                    content = @Content(mediaType = "application/json"))
     })
-    // Get All Categories
     @GetMapping("/all")
     public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {
-        List<CategoryResponseDto> categories = categoriesService.getAllCategories();
-        return ResponseEntity.ok(categories);
+        try {
+            List<CategoryResponseDto> categories = categoriesService.getAllCategories();
+            if (categories.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(categories, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

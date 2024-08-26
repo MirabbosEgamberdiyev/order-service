@@ -1,6 +1,5 @@
 package fido.uz.Order.repository;
 
-import fido.uz.Order.entity.Category;
 import fido.uz.Order.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

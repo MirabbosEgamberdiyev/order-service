@@ -1,6 +1,7 @@
 package fido.uz.Order.controller;
 
 import fido.uz.Order.dto.ProductDto;
+import fido.uz.Order.dto.ProductResponseDto;
 import fido.uz.Order.entity.Product;
 import fido.uz.Order.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +60,7 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductById(@PathVariable Long id) {
         try {
-            Product product = productService.getProductById(id);
+            ProductResponseDto product = productService.getProductById(id);
             return new ResponseEntity<>(product, HttpStatus.OK);
         } catch (IllegalArgumentException ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
@@ -74,8 +75,8 @@ public class ProductController {
                             schema = @Schema(implementation = Product.class)))
     })
     @GetMapping("/all")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
+        List<ProductResponseDto> products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
