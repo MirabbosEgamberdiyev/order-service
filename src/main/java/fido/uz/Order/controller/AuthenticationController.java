@@ -13,15 +13,18 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@Validated
 public class AuthenticationController {
 
     private final JwtService jwtService;
@@ -41,11 +44,11 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup-user")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<User> registerUser(@RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<User> registerUser(@Valid @RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signUpUser(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
+
 
     @Operation(summary = "Register a new admin")
     @ApiResponses(value = {
@@ -56,8 +59,8 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup-admin")
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<User> registerAdmin(@RequestBody RegisterUserDto registerUserDto) {
+//    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<User> registerAdmin(@Valid @RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signUpAdmin(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
@@ -71,8 +74,8 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/signup-super-admin")
-    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<User> registerSuperAdmin(@RequestBody RegisterUserDto registerUserDto) {
+//    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<User> registerSuperAdmin(@Valid @RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signUpSuperAdmin(registerUserDto);
         return ResponseEntity.ok(registeredUser);
     }
@@ -86,7 +89,7 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
+    public ResponseEntity<LoginResponse> authenticate(@Valid @RequestBody LoginUserDto loginUserDto) {
         try {
             User authenticatedUser = authenticationService.authenticate(loginUserDto);
             String jwtToken = jwtService.generateToken(authenticatedUser);
@@ -124,7 +127,7 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @DeleteMapping("/delete-account")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteAccount() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -150,8 +153,8 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/change-password")
-    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+//    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = ((UserDetails) authentication.getPrincipal()).getUsername();
@@ -174,7 +177,7 @@ public class AuthenticationController {
                     content = @Content(mediaType = "application/json"))
     })
     @PostMapping("/reset-password")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordDto resetPasswordDto) {
         try {
             authenticationService.resetPassword(resetPasswordDto);

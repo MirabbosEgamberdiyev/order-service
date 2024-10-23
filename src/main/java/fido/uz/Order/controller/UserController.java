@@ -52,7 +52,7 @@ public class UserController {
                     content = @Content(mediaType = "application/json"))
     })
     @GetMapping("/")
-    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
+//    @PreAuthorize("hasAuthority('ROLE_USER') or hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<List<User>> allUsers() {
         List<User> users = userService.allUsers();
         return ResponseEntity.ok(users);
